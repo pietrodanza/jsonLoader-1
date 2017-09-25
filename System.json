@@ -1,0 +1,71 @@
+{
+    "microservices": [
+
+      {
+        "name":"main",
+        "outputPort" : [
+          {
+            "name": "dep1Out",
+            "channel": 1,
+            "interfaces":[
+              {
+                "name":"dep1Interface"
+              }
+            ]
+          }
+        ],
+        "inputPort" : [
+          {
+            "name": "mainIn",
+            "channel": 2,
+            "interfaces":[
+              {
+                "name":"mainInterface"
+              }
+            ]
+          },
+        ],
+      },
+      {
+        "name":"dep1",
+        "outputPort" : [],
+        "inputPort" : [
+          {
+            "name": "dep1In",
+            "channel": 1,
+            "interfaces":[
+              {
+                "name":"dep1Interface"
+              }
+            ]
+          },
+        ],
+      }
+    ],
+    "channels":[
+      {
+        "num": 1,
+        "port": 8000,
+        "protocol": "sodep",
+        "inputMicroservice": "dep1",
+        "outputMicroservices":[
+          {
+            "name": "main"
+          }
+        ]
+      },
+
+      {
+        "num": 2,
+        "port": 8001,
+        "protocol": "sodep",
+        "inputMicroservice": "main",
+        "outputMicroservices":[
+          {
+            "name": "client"
+          }
+        ]
+      },
+
+    ]
+}
