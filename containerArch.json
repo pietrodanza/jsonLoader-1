@@ -1,0 +1,34 @@
+{
+    "containers":[
+      {
+        "microservices":[
+          {
+            "name":"dep1"
+          }
+        ],
+        "links":[
+          {
+            "name": "link1"
+          }
+        ]
+      },
+
+      {
+        "microservices":[
+          {
+            "name":"main"
+          }
+        ],
+        "links":[
+          {
+            "name":"link1"
+          },
+          {
+            "name":"link2"
+          }
+        ]
+      }
+
+    ]
+
+}

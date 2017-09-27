@@ -1,0 +1,6 @@
+FROM jolielang/jolie-docker-deployer
+COPY main.ol main.ol
+ENV JDEP_LOCATION_dep1Out=socket://7a6aa273-84f5-40a6-b8cb-cd359fe448c6-CNT-1:8000
+EXPOSE 8001
+COPY launch1.sh / 
+CMD ["/bin/bash","/launch1.sh"]

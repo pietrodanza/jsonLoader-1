@@ -1,0 +1,5 @@
+FROM jolielang/jolie-docker-deployer
+COPY dep1.ol dep1.ol
+EXPOSE 8000
+COPY launch0.sh / 
+CMD ["/bin/bash","/launch0.sh"]

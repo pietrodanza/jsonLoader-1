@@ -1,0 +1,72 @@
+{
+    "microservices": [
+
+      {
+        "name":"main",
+        "outputPort" : [
+          {
+            "name":"dep1Out",
+            "interfaces":[
+              {
+                "name":"jsonLoader/main.ol"
+              }
+            ]
+          }
+        ],
+        "inputPort" : [
+          {
+            "name":"mainIn",
+            "interfaces":[
+              {
+                "name":"mainInterface",
+                "path":"jsonLoader/main.ol"
+              }
+            ]
+          },
+        ],
+      },
+      {
+        "name":"dep1",
+        "outputPort" : [],
+        "inputPort" : [
+          {
+            "name": "dep1In",
+            "interfaces":[
+              {
+                "name":"dep1Interface",
+                "path":"jsonLoader/dep1.ol"
+              }
+            ],
+          }
+        ]
+      }
+    ],
+    "links": [
+      {
+        "name": "link1",
+        "protocol": "sodep",
+        "inputMicroservice":{
+          "name": "dep1",
+          "portName": "dep1In"
+          } ,
+        "outputMicroservice":{
+          "name": "main",
+          "portName": "dep1Out"
+          }
+      },
+      {
+        "name": "link2",
+        "protocol": "sodep",
+        "inputMicroservice":{
+          "name": "main",
+          "portName": "mainIn"
+          } ,
+        "outputMicroservice":{
+          "name": "client",
+          "portName": "mainOut"
+          }
+      }
+
+
+    ]
+}
