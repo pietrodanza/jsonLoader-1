@@ -3,16 +3,84 @@ include "string_utils.iol"
 include "console.iol"
 include "file.iol"
 include "exec.iol"
-include "InterfaceAPI.iol"
+//include "InterfaceAPI.iol"
 
+/*
 outputPort Jocker {
 Location: "socket://localhost:8008"
 Protocol: sodep
 Interfaces: InterfaceAPI
 }
-
+*/
 main
 {
+  file.filename = "containerArch.json";
+  file.format = "json";
+  readFile@File(file)(responseC);
+
+  valueToPrettyString@StringUtils(responseC)(pretty);
+
+  fileM.filename = "microservicesArch.json";
+  fileM.format = "json";
+  readFile@File(fileM)(responseM);
+
+  global.freshname = new;
+  for ( i=0, i< #responseC.containers, i++ ) {
+    rqCnt.name = global.freshname +"-CNT-"+(i+1);
+    container -> responseC.containers[i];
+    launcherFile.filename = "launch"+i+".sh";
+    //launcherFile.format = "sh";
+    launcherFile.content = "sh /microservice/get_dependencies.sh > /dependencies.iol\n";
+    for ( j=0, j< #container.microservices, j++ ) {
+      nameMicroservice = container.microservices[j].name[0];
+      dockerFile.filename = "dockerFile" + nameMicroservice;
+      dockerFile.content = "" +
+      "FROM jolielang/jolie-docker-deployer\n"+
+      "COPY "+ nameMicroservice+ ".ol " + nameMicroservice + ".ol\n";
+      if( j == #container.microservices-1 ) {
+        launcherFile.content += "jolie " + nameMicroservice + ".ol "
+      }else{
+        launcherFile.content += "jolie " + nameMicroservice + ".ol & "
+      };
+      for (z=0, z< #container.links, z++){
+        nameLink = container.links[z].name[0];
+        for (l=0, l<#responseM.links, l++){
+          linkToCompare -> responseM.links[l];
+          if( nameLink == linkToCompare.name[0]) {
+            if( nameMicroservice == linkToCompare.inputMicroservice[0].name[0] ) {
+                //salvare indirizzo --MANCA CONTROLLO PORTA
+                port= "800"+l;
+                dockerFile.content += "EXPOSE " + port + "\n";
+                inMicroserviceArr.(nameMicroservice).port = port;
+                inMicroserviceArr.(nameMicroservice).containerName = rqCnt.name;
+                println@Console( nameMicroservice +" è del " + linkToCompare.name[0] + " è input" )()
+            }else if( nameMicroservice == responseM.links[l].outputMicroservice[0].name[0] ) {
+                portOut = responseM.links[l].outputMicroservice[0].portName[0];
+                inputMicroName = responseM.links[l].inputMicroservice[0].name[0];
+                portInputMicro = inMicroserviceArr.(inputMicroName).port;
+                nameCntInputMicro = inMicroserviceArr.(inputMicroName).containerName;
+
+                dockerFile.content += "ENV JDEP_LOCATION_"+ portOut +"="+
+                "socket://" + nameCntInputMicro +":"+ portInputMicro + "\n";
+
+                println@Console( dockerFile.content )();
+                println@Console( nameMicroservice +" è del " + linkToCompare.name[0] + " è output" )()
+            }
+          }
+        }
+      }
+    };
+
+    writeFile@File(launcherFile)( );
+    dockerFile.content += "COPY " + launcherFile.filename + " / \n"+
+    "CMD [\"/bin/bash\",\"/"+launcherFile.filename+"\"]";
+    writeFile@File(dockerFile)( )
+  }
+}
+
+
+
+  /*
 file.filename = "System.json";
 file.format = "json";
 readFile@File(file)(response);
@@ -87,5 +155,4 @@ for (i=0, i< #response.microservices, i++) {
     println@Console( "CONTAINER STARTED: "+ crq.id )( )
   }
 
-
-}
+*/
