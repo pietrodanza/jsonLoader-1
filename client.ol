@@ -9,7 +9,7 @@ OneWay:
 }
 
 outputPort mainOut {
-Location: "socket://localhost:8001"
+Location: "socket://172.17.0.3:8001"
 Protocol: sodep
 Interfaces: mainInterface
 }
